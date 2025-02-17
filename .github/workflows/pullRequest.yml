@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: macos-latest
+    runs-on: macos-latest  # Changed from macos-11 to macos-latest
     steps:
       - uses: actions/checkout@v2
 
@@ -22,6 +22,8 @@ jobs:
           xcode-version: latest-stable
 
       - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'  # Specify your Ruby version
 
       - name: Install Bundler
         run: gem install bundler
@@ -30,7 +32,7 @@ jobs:
         run: bundle install
 
       - name: Swift Packages Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4  # Updated from v2
         id: cache
         with:
           path: |
