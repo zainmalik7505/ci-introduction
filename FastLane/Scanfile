@@ -3,10 +3,11 @@
 # For more information about this configuration visit:
 # https://github.com/fastlane/scan#scanfile
 
+
 project "AnyApp.xcodeproj"
 scheme "AnyApp"
 sdk "iphonesimulator"
-device "iPhone 15"
+device "iPhone SE (16.4)"  
 code_coverage true
 xcargs "-parallelizeTargets"
 prelaunch_simulator true
