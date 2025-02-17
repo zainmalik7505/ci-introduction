@@ -7,7 +7,7 @@
 project "AnyApp.xcodeproj"
 scheme "AnyApp"
 sdk "iphonesimulator"
-device "iPhone SE (16.4)"  
+device "iPhone 15 Pro (17.0)"  
 code_coverage true
 xcargs "-parallelizeTargets"
 prelaunch_simulator true
