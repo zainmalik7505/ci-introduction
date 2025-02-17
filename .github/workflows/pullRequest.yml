@@ -1,56 +1,48 @@
-name: Test Runner Availability
-on: workflow_dispatch
+name: Pull Request
+
+on:
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
 jobs:
   test:
     runs-on: macos-latest
     steps:
-      - run: echo "Runner is working"
-      
-# name: Pull Request
+      - uses: actions/checkout@v2
 
-# on:
-#   pull_request:
-#     branches:
-#       - develop
-#   workflow_dispatch:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
 
-# jobs:
-#   test:
-#     runs-on: macos-latest
-#     steps:
-#       - uses: actions/checkout@v2
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
 
-#       - name: Cancel Previous Runs
-#         uses: styfle/cancel-workflow-action@0.9.1
-#         with:
-#           access_token: ${{ github.token }}
+      - uses: ruby/setup-ruby@v1
 
-#       - uses: maxim-lobanov/setup-xcode@v1
-#         with:
-#           xcode-version: latest-stable
+      - name: Install Bundler
+        run: gem install bundler
 
-#       - uses: ruby/setup-ruby@v1
+      - name: Install gems
+        run: bundle install
 
-#       - name: Install Bundler
-#         run: gem install bundler
+      - name: Swift Packages Cache
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: |
+            Build/SourcePackages
+            Build/Build/Products
+          key: ${{ runner.os }}-deps-v1-${{ hashFiles('AnyApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: ${{ runner.os }}-deps-v1-
 
-#       - name: Install gems
-#         run: bundle install
+      - name: Run Tests (No Cache)
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: bundle exec fastlane unit_test
 
-#       - name: Swift Packages Cache
-#         uses: actions/cache@v2
-#         id: cache
-#         with:
-#           path: |
-#             Build/SourcePackages
-#             Build/Build/Products
-#           key: ${{ runner.os }}-deps-v1-${{ hashFiles('AnyApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
-#           restore-keys: ${{ runner.os }}-deps-v1-
-
-#       - name: Run Tests (No Cache)
-#         if: steps.cache.outputs.cache-hit != 'true'
-#         run: bundle exec fastlane unit_test
-
-#       - name: Run Tests (Cache)
-#         if: steps.cache.outputs.cache-hit == 'true'
-#         run: bundle exec fastlane unit_test skip_package_dependencies_resolution:true
+      - name: Run Tests (Cache)
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: bundle exec fastlane unit_test skip_package_dependencies_resolution:true
